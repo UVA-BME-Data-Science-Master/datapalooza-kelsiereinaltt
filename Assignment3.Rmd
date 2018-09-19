@@ -2,48 +2,46 @@
 title: "Assignment 3"
 author: "Kelsie Reinaltt"
 date: "9/15/2018"
-output: html_document
+output:
+  html_document: default
 ---
+# Assignment 3: Chapters 11-13,15
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library("tidyverse")
+library("nycflights13")
+#install.packages("Lahman")
+install.packages("datamodelr")
+library("fueleconomy")
+library("WHO")
 ```
 
-## R Markdown
+#11.2.2 EXERCISES
 
-### ASSIGNMENT 3: EXERCISES IN CHAPTERS 11, 12, 13, 15
+## Question 1
 
-### 11.2.2 EXERCISES
+#### I would use the read_delim() function where the first argument is the file name that you would like to read in and the second argument is the delimiter that the fields are separated by (in this case the "|").
 
-## 1. What function would you use to read a file where fields were separated with "|"?
-
-# I would use the read_delim() function where the first argument is the file name that you would like to read in and the second argument is the delimiter that the fields are separated by (in this case the "|").
-
-## 2. Apart from file, skip, and comment, what other arguments do read_csv() and read_tsv() have in common?
-
+## Question 2
+#### Other arguments that they have in common include col_names, col_types, locale, na, quoted_na, quote, comment, trim_ws, skip, n_max, guess_max, progress.
 ```{r}
   union(names(formals(read_csv)), names(formals(read_tsv)))
 ```
 
-# Other arguments that they have in common include col_names, col_types, locale, na, quoted_na, quote, comment, trim_ws, skip, n_max, guess_max, progress.
+## Question 3
+#### The most important argument to read_fwf() is the col_positions one because it tells where this function to begin and end reading. 
 
-## 3. What are the most important arguments to read_fwf()?
+## Question 4
 
-# The most important argument to read_fwf() is the col_positions one because it tells where this function to begin and end reading. 
+# In order to read "x,y\n1,'a,b'" into the data frame, we will have to use read_csv(x,",", quote = "'") - this sets the delimiters as commas and single quotation marks. Additionally, you can also use read_csv(x,quote = "'") because the function already separates out based on commas. 
 
-## 4. Sometimes strings in a CSV file contain commas. To prevent them from causing problems they need to be surrounded by a quoting character, like " or '. By convention, read_csv() assumes that the quoting character will be ", and if you want to change it you'll need to use read_delim() instead. What arguments do you need to specify to read the following text into a data frame?
-
-"x,y\n1,'a,b'"
-
-# In order to read this into the data frame, we will have to use read_csv(x,",", quote = "'") - this sets the delimiters as commas and single quotation marks. Additionally, you can also use read_csv(x,quote = "'") because the function already separates out based on commas. 
-
-## 5. Identify what is wrong with each of the following inline CSV files. What happens when you run the code?
-#When you run the first line, you get 2 parsing failures. This is because two columns are created (a & b) but then the other inputs have 3 columns (since there are 2 other inputs, you get 2 parsing failures)
-# Second line - this sets 3 columns (a, b and c); however, in the second row, there are only two columns and in the third row, there are 4. 
-# Third line - this creates a new row ********************8
-# Fourth line - *****************8
-# Fifth line - the values should be separated by a comma but are instead separated by a semicolon. 
+## Question 5 
+#### First line -  you get 2 parsing failures. This is because two columns are created (a & b) but then the other inputs have 3 columns (since there are 2 other inputs, you get 2 parsing failures)
+#### Second line - this sets 3 columns (a, b and c); however, in the second row, there are only two columns and in the third row, there are 4. 
+#### Third line - this uses incorrect syntax to create a new row (should just be \n). In addition, there is only one thing in the third row in the first row there are two, and the thing is a "1" treated as a character when it is truly an integer. 
+#### Fourth line - all rows are made into strings because of the first row
+#### Fifth line - the values should be separated by a comma but are instead separated by a semicolon.
 ```{r}
 read_csv("a,b\n1,2,3\n4,5,6")
 read_csv("a,b,c\n1,2\n1,2,3,4")
@@ -52,17 +50,14 @@ read_csv("a,b\n1,2\na,b")
 read_csv("a;b\n1;3")
 ```
 
-### 11.3.5 EXERCISES
+# 11.3.5
 
-## 1. What are the most important arguments to locale()?
+## Question 1
+#### Arguments to locale() include date_names, date_format, time_format, decimal_mark, grouping_mark, tz, encoding, asciify. The importance of the arguments depends on what you are trying to do within the locale function (e.g. if you want to change the timezone, you would use the tz argument).
 
-# Arguments to locale() include date_names, date_format, time_format, decimal_mark, grouping_mark, tz, encoding, asciify. The importance of the arguments depends on what you are trying to do within the locale function (e.g. if you want to change the timezone, you would use the tz argument).
-
-## 2. What happens if you try and set decimal_mark and grouping_mark to the same character? What happens to the default value of grouping_mark when you set decimal_mark to ","? What happens to the default value of decimal_mark when you set the grouping_mark to "."?
-
-# Locale gives you an error if you set decimal mark and grouping mark to the same thing, as shown below. 
-# When you set the decimal_mark to "," the grouping_mark is set to "." When you set the grouping mark to ".", the decimal mark is "."
-
+## Question 2
+#### Locale gives you an error if you set decimal mark and grouping mark to the same thing, as shown below. 
+#### When you set the decimal_mark to "," the grouping_mark is set to "." When you set the grouping mark to ".", the decimal mark is "."
 ```{r}
 locale(decimal_mark = ".", group_mark = ".")
 ```
@@ -70,34 +65,28 @@ locale(decimal_mark = ".", group_mark = ".")
 locale(decimal_mark = ",")
 ```
 
-
-
-## 3. I didn't discuss the date_format and time_format options to locale(). What do they do? Construct an example that shows when they might be useful.
-
-# According to the locale() documentation, the date_format() & time_format() provide the default date and time formats. The time format isn't currently used for anything, but the date format is used when guessing column types. The default date format is %Y-%m-%d. In the readr documentation, they have included an exammple: 
+## Question 3
+#### According to the locale() documentation, the date_format() & time_format() provide the default date and time formats. The time format isn't currently used for anything, but the date format is used when guessing column types. The default date format is %Y-%m-%d. In the readr documentation, they have included an exammple: 
 ```{r}
 parse_date("1 janvier 2015", "%d %B %Y", locale = locale("fr"))
 ```
 
-## 4. If you live outside the US, create a new locale object that encapsulates the settings for the types of file you read most commonly.
-
-# In India, the locale is written as day, month, year (as opposed to the default which is month, day, year)
+## Question 4
+#### In India, the locale is written as day, month, year (as opposed to the default which is month, day, year)
 
 ```{r}
 india_locale <- locale(date_format = "%d/%m/%Y")
 
 ```
 
-## 5. What's the difference between read_csv() and read_csv2()?
+## Question 5
+#### read_csv() uses a comma as its delimiter while read_csv2() uses a semicolon as its delimiter. 
 
-# read_csv() uses a comma as its delimiter while read_csv2() uses a semicolon as its delimiter. 
+## Question 6
+#### Some of the most common encodings used in Europe include IEC 8859. In Asia, different encodings are used like GB 18030 (primarily in China) and EUC (used primarily in Japan). 
 
-## 6. What are the most common encodings used in Europe? What are the most common encodings used in Asia? Do some googling to find out.
 
-# Some of the most common encodings used in Europe include IEC 8859. In Asia, different encodings are used like GB 18030 (primarily in China) and EUC (used primarily in Japan). 
-********************
-
-## 7. Generate the correct format string to parse each of the following dates and times:
+## Question 7
 ```{r}
 d1 <- "January 1, 2010"
 d2 <- "2015-Mar-07"
@@ -125,20 +114,17 @@ parse_time(t2, "%H:%M:%OS %p")
 
 
 
-### 12.2.1 EXERCISES
+# 12.2.1
+## Question 1
+#### In the sample tables, there are different variables that each have observations within each column (so each variable has a column and each row consists of observations of different variables for a specific country). 
+#### Table 1 - variables include country, year, cases, population. Observations are in the row and include the year, number of cases and population of each country in that year. 
+#### Table 2 - variables include country, year, type and count. Observations are organized into rows and include the cases and count for each year and country
+#### Table 3 - variables include country, year and rate - observations are organized into rows with the corresponding countries and years.
+#### Table 4a - variables include country and two years. Observations include the country and the number of cases for that country in the two years in this case 1999 & 2000. 
+#### Table 4b - variables include country and two years; observations are organized to reflect the population in that country/year. 
 
-## 1. Using prose, describe how the variables and observations are organised in each of the sample tables.
-
-# In the sample tables, there are different variables that each have observations within each column (so each variable has a column and each row consists of observations of different variables for a specific country). 
-# Table 1 - variables include country, year, cases, population. Observations are in the row and include the year, number of cases and population of each country in that year. 
-# Table 2 - variables include country, year, type and count. Observations are organized into rows and include the cases and count for each year and country
-# Table 3 - variables include country, year and rate - observations are organized into rows with the corresponding countries and years.
-# Table 4a - variables include country and two years. Observations include the country and the number of cases for that country in the two years in this case 1999 & 2000. 
-# Table 4b - variables include country and two years; observations are organized to reflect the population in that country/year. 
-
-## 2. Compute the rate for table2, and table4a + table4b. You will need to perform four operations:
-
-
+## Question 2
+#### Because no table has both cases and population, they both required extra steps in order to calculate the cases per capita. Thus, they were both relatively similar in terms of difficulty working with. It would be easiest to work with a table that has both cases and population so that we could just use one mutate function to divide and get the correct ratio. 
 ```{r}
 # Extract the number of TB cases per country per year.
 
@@ -178,12 +164,7 @@ table4c <-
 table4c
 ```
 
-## Which representation is easiest to work with? Which is hardest? Why?
-
-# Because no table has both cases and population, they both required extra steps in order to calculate the cases per capita. Thus, they were both relatively similar in terms of difficulty working with. It would be easiest to work with a table that has both cases and population so that we could just use one mutate function to divide and get the correct ratio. 
-
-## 3. Recreate the plot showing change in cases over time using table2 instead of table1. What do you need to do first?
-
+## Question 3
 ```{r}
 table2 %>%
   filter(type == "cases") %>%
@@ -194,11 +175,12 @@ table2 %>%
   ylab("cases")
 ```
 
-### 12.3.3 EXERCISES
+# 12.3.3
 
-## 1. Why are gather() and spread() not perfectly symmetrical?
-# Carefully consider the following example:
-
+## Question 1
+#### Both spread() and gather() have a convert argument. What does it do?
+####convert (if true) will converty the values input to gather/spread into the appropriate type. 
+#### gather() and spread() are not symmetrical because they treat the original column type differently - gather ignores the column type and standardizes everything into the same type for one uniform vecotr whereas spread() must know the type of each column
 ```{r}
 stocks <- tibble(
   year   = c(2015, 2015, 2016, 2016),
@@ -210,19 +192,18 @@ stocks %>%
   gather("year", "return", `2015`:`2016`)
 # (Hint: look at the variable types and think about column names.)
 ```
-## Both spread() and gather() have a convert argument. What does it do?
-************************************************************************
 
-## 2. Why does this code fail?
+## Question 2
+#### The code fails because 1999 and 2000 are not in quotes - in the current version of the code, 1999 and 2000 are treated as row column numbers which is not the intent of the code (rather, we are looking for years 1999 & 2000). To remedy this, we should put 1999 and 2000 in quotes. 
 
-#table4a %>% 
-#  gather(1999, 2000, key = "year", value = "cases")
-#> Error in inds_combine(.vars, ind_list): Position must be between 0 and n
+```{r}
+table4a %>% 
+gather(1999, 2000, key = "year", value = "cases")
+```
 
-#The code fails because 1999 and 2000 are not in quotes - in the current version of the code, 1999 and 2000 are treated as row column numbers which is not the intent of the code (rather, we are looking for years 1999 & 2000). To remedy this, we should put 1999 and 2000 in quotes. 
-
-## 3. Why does spreading this tibble fail? How could you add a new column to fix the problem?
-
+##  Question 3
+#### This fails because there are two rows with Phillip Woods' age. To fix this, we could add a new column that specifies the observation so that we could have two rows with Phillip Woods' age; however, the first would be observation 1 and the second would be observation 2. 
+```{r}
 people <- tribble(
   ~name,             ~key,    ~value,
   #-----------------|--------|------
@@ -232,14 +213,10 @@ people <- tribble(
   "Jessica Cordero", "age",       37,
   "Jessica Cordero", "height",   156
 )
+```
 
-# Thisfails because there are two rows with Phillip Woods' age. To fix this, we could add a new column that specifies the observation so that we could have two rows with Phillip Woods' age; however, the first would be observation 1 and the second would be observation 2. 
-
-## 4. Tidy the simple tibble below. Do you need to spread or gather it? What are the variables?
-
-
-
-# In order to tidy the tibble below , we need to gather it. The variables are pregnant (which can have the observation of either yes or no), sex (which can be either male or female), and count (which counts the number of instances where pregnancies occur in either males or females). 
+## Question 4
+#### In order to tidy the tibble below , we need to gather it. The variables are pregnant (which can have the observation of either yes or no), sex (which can be either male or female), and count (which counts the number of instances where pregnancies occur in either males or females). 
 
 ```{r}
 preg <- tribble(
@@ -255,8 +232,9 @@ tidied_preg
 
 ### 12.4.3 EXERCISES
 
-## 1. What do the extra and fill arguments do in separate()? Experiment with the various options for the following two toy datasets.
-
+## Question 1
+#### The extra argument controls what happens when there are too many pieces (if sep is a character vector) -- there are 3 options: warn (emit a warning and drop extra values), drop (drop any extra values without warning), merge (only split at most length(into) times). Again  if sep is a character vector, fill controls what happens if there are NOT ENOUGH pieces -- there are 3 options: warn (emits a warning and fills from right, right - fills with missing values on the right), left - fills with missing values on the left. The default value in both cases is warn. 
+#### experimenting done in console and agrees with above description. 
 ```{r}
 tibble(x = c("a,b,c", "d,e,f,g", "h,i,j")) %>% 
   separate(x, c("one", "two", "three"))
@@ -264,119 +242,413 @@ tibble(x = c("a,b,c", "d,e,f,g", "h,i,j")) %>%
 tibble(x = c("a,b,c", "d,e", "f,g,i")) %>% 
   separate(x, c("one", "two", "three"))
 ```
-**************************************
 
-## 2. Both unite() and separate() have a remove argument. What does it do? Why would you set it to FALSE?
-# remove() removes the old variable - you would set this to false if you want to create a new variable but keep the old one. 
+## Question 2
+#### remove() removes the old variable - you would set this to false if you want to create a new variable but keep the old one. 
 
-## 3. Compare and contrast separate() and extract(). Why are there three variations of separation (by position, by separator, and with groups), but only one unite?
-****************************************
-
-### 12.5.1 EXERCISES
-
-## 1. Compare and contrast the fill arguments to spread() and complete().
-
-# Spread() allows the user to choose a specific value to replace all missing NA values. However, complete() specifies a list to replace NA values that has specific values for different variables. A similarity includes that both replacec both implicit and explicit missing values. 
-
-## 2. What does the direction argument to fill() do?
-
-# Direction tells you the direction in which to fill missing values (can be down - the default - or up)
-
-### 12.6.1 EXERCISES ************************************************
-
-## 1. In this case study I set na.rm = TRUE just to make it easier to check that we had the correct values. Is this reasonable? Think about how missing values are represented in this dataset. Are there implicit missing values? What's the difference between an NA and zero?
-
-## 2. What happens if you neglect the mutate() step? (mutate(key = stringr::str_replace(key, "newrel", "new_rel")))
-
-## 3. I claimed that iso2 and iso3 were redundant with country. Confirm this claim.
-
-## 4. For each country, year, and sex compute the total number of cases of TB. Make an informative visualisation of the data.
-
-### 13.2.1 EXERCISES 
-
-## 1. Imagine you wanted to draw (approximately) the route each plane flies from its origin to its destination. What variables would you need? What tables would you need to combine?
-
-# flights table: origin and dest
-# airports table: longitude and latitude variables
-# join flights with airports twice. The first join adds the location of the origin airport (origin). The second join adds the location of destination airport (dest).
-
-## 2. I forgot to draw the relationship between weather and airports. What is the relationship and how should it appear in the diagram?
-
-# faa in airports is matched with origin in weather.
-
-## 3. weather only contains information for the origin (NYC) airports. If it contained weather records for all airports in the USA, what additional relation would it define with flights?
-
-# The variables in each dataset (year/month/day/hour in both, and then origin in weather & dest in flight) would be matched.
+## Question 3
+#### Separate turns a single character column into multiple columns, given either regular expression or a vector of character column into multiple columns. Extract turns each group into a new column given a regular expression with capturing groups. Both of these functions turn one column into many columns - there are many ways to do this; however, unite turns multiple columns into one, which is relatively simple.
 
 
-## 4. We know that some days of the year are "special", and fewer people than usual fly on them. How might you represent that data as a data frame? What would be the primary keys of that table? How would it connect to the existing tables?
+# 12.5.1 EXERCISES
 
-### 13.3.1 EXERCISES
+## Question 1
+#### Spread() allows the user to choose a specific value to replace all missing NA values. However, complete() specifies a list to replace NA values that has specific values for different variables. A similarity includes that both replacec both implicit and explicit missing values. 
 
-## 1. Add a surrogate key to flights.
+## Question 2
+#### Direction tells you the direction in which to fill missing values (can be down - the default - or up)
 
-## 2. Identify the keys in the following datasets
 
-## 2.1 Lahman::Batting,
-## 2.2 babynames::babynames
-## 2.3 nasaweather::atmos
-## 2.4 fueleconomy::vehicles
-## 2.5 ggplot2::diamonds
-## (You might need to install some packages and read some documentation.)
+# 12.6.1 EXERCISES
 
-## 3. Draw a diagram illustrating the connections between the Batting, Master, and Salaries tables in the Lahman package. Draw another diagram that shows the relationship between Master, Managers, AwardsManagers.
+## Question 1
+#### In this data NA is assigned to values when there wasn't a recording for that case in a particular year. A 0 is assigned if the data was recorded but there were no cases. Since there are no implicit missing values it is okay to drop NA. 
+#### A proper analysis would not exclude the missing values because it still counts as information - it is the presence of an absence. Therefore it is reasonable, but for appropriate descriptive statistics it is important to report the number of missing values.
+```{r}
+who %>% 
+        count(country)
 
-## How would you characterise the relationship between the Batting, Pitching, and Fielding tables?
+who %>% 
+        count(country, iso2, iso3)
+```
 
-### 13.4.6 EXERCISES 
-## 1. Compute the average delay by destination, then join on the airports data frame so you can show the spatial distribution of delays. Here's an easy way to draw a map of the United States:
+## Question 2
+#### If you neglect the mutate() step, R will not know how to separate the values stored as newrel and will end up displaying a warning indicating that therethere are "too few values".
 
-airports %>%
-  semi_join(flights, c("faa" = "dest")) %>%
-  ggplot(aes(lon, lat)) +
+## Question 3
+#### When adding the additional variables (iso2, iso3), they output the abbreviation for a country. This is redundant because we are mentioning the name of the country three times.
+```{r}
+library("WHO")
+#select(who3, country, iso2, iso3) %>%
+  #distinct() %>%
+  #group_by(country) %>%
+  #filter(n() > 1)
+```
+
+## Question 4
+
+```{r}
+  #who5 %>%
+  #group_by(country, year, sex) %>%
+  #filter(year > 1995) %>%
+  #summarise(cases = sum(cases)) %>%
+  #unite(country_sex, country, sex, remove = FALSE) %>%
+  #ggplot(aes(x = year, y = cases, group = country_sex, colour = sex)) +
+  #geom_line()
+```
+
+# 13.2.1 EXERCISES 
+
+## Question 1
+
+#### flights table: origin and dest
+#### airports table: longitude and latitude variables
+#### join flights with airports twice. The first join adds the location of the origin airport (origin). The second join adds the location of destination airport (dest).
+
+## Question 2
+#### faa in airports is matched with origin in weather.
+
+## Question 3
+#### The variables in each dataset (year/month/day/hour in both, and then origin in weather & dest in flight) would be matched.
+
+
+## Question 4
+#### In order to represent these special dates, I would create a dataset that has dates - the primary key in this case would be the date which would match to year/month/day and also the number of flights on that special day.
+
+# 13.3.1 EXERCISES
+
+## Question 1
+```{r}
+library("nycflights13")
+flights %>%
+  arrange(year, month, day, sched_dep_time, carrier, flight) %>%
+  mutate(flight_id = row_number()) %>%
+  glimpse()
+```
+
+## Question 2
+
+#### 2.1 Lahman::Batting,
+#### Keys are playerID, yearID, stint
+#### 2.2 babynames::babynames
+#### Keys are year, sex, name
+#### 2.3 nasaweather::atmos
+#### Keys are lat, long, year, month
+#### 2.4 fueleconomy::vehicles
+#### Keys are id
+#### 2.5 ggplot2::diamonds
+#### No keys 
+#### (You might need to install some packages and read some documentation.)
+
+## Question 3
+#### How would you characterise the relationship between the Batting, Pitching, and Fielding tables?
+#### All of these data sets have a 1 to 1 relationship to each other and their primary keys are playerID, yearID and stint variables. 
+```{r}
+library("Lahman")
+library("datamodelr")
+dm1 <- dm_from_data_frames(list(Batting = Lahman::Batting,
+                                Master = Lahman::Master,
+                                Salaries = Lahman::Salaries)) %>%
+  dm_set_key("Batting", c("playerID", "yearID", "stint")) %>%
+  dm_set_key("Master", "playerID") %>%
+  dm_set_key("Salaries", c("yearID", "teamID", "playerID")) %>%
+  dm_add_references(
+    Batting$playerID == Master$playerID,
+    Salaries$playerID == Master$playerID
+  )
+
+dm_create_graph(dm1, rankdir = "LR", columnArrows = TRUE)
+dm2 <- dm_from_data_frames(list(Master = Lahman::Master,
+                                Managers = Lahman::Managers,
+                                AwardsManagers = Lahman::AwardsManagers)) %>%
+  dm_set_key("Master", "playerID") %>%
+  dm_set_key("Managers", c("yearID", "teamID", "inseason")) %>%
+  dm_set_key("AwardsManagers", c("playerID", "awardID", "yearID")) %>%
+  dm_add_references(
+    Managers$playerID == Master$playerID,
+    AwardsManagers$playerID == Master$playerID
+  )
+
+dm_create_graph(dm2, rankdir = "LR", columnArrows = TRUE)
+```
+
+
+# 13.4.6 EXERCISES 
+#### Question 1
+```{r}
+avg_dest_delays <-
+  flights %>%
+  group_by(dest) %>%
+  # arrival delay NA's are cancelled flights
+  summarise(delay = mean(arr_delay, na.rm = TRUE)) %>%
+  inner_join(airports, by = c(dest = "faa"))
+
+avg_dest_delays %>%
+  ggplot(aes(lon, lat, colour = delay)) +
     borders("state") +
     geom_point() +
     coord_quickmap()
-## (Don't worry if you don't understand what semi_join() does - you'll learn about it next.)
+```
 
-## You might want to use the size or colour of the points to display the average delay for each airport.
+#### (Don't worry if you don't understand what semi_join() does - you'll learn about it next.)
+#### You might want to use the size or colour of the points to display the average delay for each airport.
 
-## 2. Add the location of the origin and destination (i.e. the lat and lon) to flights.
+## Question 2
+```{r}
+airport_locations <- airports %>%
+  select(faa, lat, lon)
 
-## 3. Is there a relationship between the age of a plane and its delays?
+flights %>%
+    select(year:day, hour, origin, dest) %>%
+  left_join(
+    airport_locations,
+    by = c("origin" = "faa")
+  ) %>%
+  left_join(
+    airport_locations,
+    by = c("dest" = "faa")
+  )
+```
 
-## 4. What weather conditions make it more likely to see a delay?
+## Question 3
+```{r}
+plane_ages <-
+  planes %>%
+  mutate(age = 2013 - year) %>%
+  select(tailnum, age)
 
-## 5. What happened on June 13 2013? Display the spatial pattern of delays, and then use Google to cross-reference with the weather.
+flights %>%
+  inner_join(plane_ages, by = "tailnum") %>%
+  group_by(age) %>%
+  filter(!is.na(dep_delay)) %>%
+  summarise(delay = mean(dep_delay)) %>%
+  ggplot(aes(x = age, y = delay)) +
+  geom_point() +
+  geom_line()
+```
 
-### 13.5.1 EXERCISES
-## 1. What does it mean for a flight to have a missing tailnum? What do the tail numbers that don't have a matching record in planes have in common? (Hint: one variable explains ~90% of the problems.)
+## Question 4
+#### As shown in the graph below, increase in precipitation generally causes an increase in delay; however, the correlation is not extremely strong.
+```{r}
+flight_weather <-
+  flights %>%
+  inner_join(weather, by = c("origin" = "origin",
+                            "year" = "year",
+                            "month" = "month",
+                            "day" = "day",
+                            "hour" = "hour"))
 
-## 2. Filter flights to only show flights with planes that have flown at least 100 flights.
+flight_weather %>%
+  group_by(precip) %>%
+  summarise(delay = mean(dep_delay, na.rm = TRUE)) %>%
+  ggplot(aes(x = precip, y = delay)) +
+    geom_line() + geom_point()
+```
 
-## 3. Combine fueleconomy::vehicles and fueleconomy::common to find only the records for the most common models.
+## Question 5
+#### According to Google, on June 13 2013, there was a large series of derechos storms especially in Southeastern US. 
+```{r}
+library(viridis)
+flights %>%
+  filter(year == 2013, month == 6, day == 13) %>%
+  group_by(dest) %>%
+  summarise(delay = mean(arr_delay, na.rm = TRUE)) %>%
+  inner_join(airports, by = c("dest" = "faa")) %>%
+  ggplot(aes(y = lat, x = lon, size = delay, colour = delay)) +
+  borders("state") +
+  geom_point() +
+  coord_quickmap() +
+  scale_colour_viridis()
+```
 
-## 4. Find the 48 hours (over the course of the whole year) that have the worst delays. Cross-reference it with the weather data. Can you see any patterns?
 
-## 5. What does anti_join(flights, airports, by = c("dest" = "faa")) tell you? What does anti_join(airports, flights, by = c("faa" = "dest")) tell you?
+# 13.5.1 EXERCISES
+## Question 1
+####When flights do have a missing tailnum, it generally means that their carrier does not report it - for example, MQ and AA (Envoy and American Airlines) do not report tailnums.
+```{r}
+flights %>%
+  anti_join(planes, by = "tailnum") %>%
+  count(carrier, sort = TRUE)
+```
 
-## 6. You might expect that there's an implicit relationship between plane and airline, because each plane is flown by a single airline. Confirm or reject this hypothesis using the tools you've learned above.
+## Question 2
+```{r}
+planes_gt100 <-
+  filter(flights) %>%
+  group_by(tailnum) %>%
+  count() %>%
+  filter(n > 100)
 
-### 15.3.1 EXERCISES 
-## 1. Explore the distribution of rincome (reported income). What makes the default bar chart hard to understand? How could you improve the plot?
+flights %>%
+  semi_join(planes_gt100, by = "tailnum")
+```
 
-## 2. What is the most common relig in this survey? What's the most common partyid?
+## Question 3
+```{r}
+glimpse(fueleconomy::vehicles)
+glimpse(fueleconomy::common)
 
-## 3. Which relig does denom (denomination) apply to? How can you find out with a table? How can you find out with a visualisation?
+fueleconomy::vehicles %>%
+  semi_join(fueleconomy::common, by = c("make", "model"))
+```
 
-### 15.4.1 EXERCISES
-## 1. There are some suspiciously high numbers in tvhours. Is the mean a good summary?
+## Question 4
+```{r}
+flights %>%
+  group_by(year, month, day) %>%
+  summarise(total_24 = sum(dep_delay, na.rm = TRUE)+ sum(arr_delay, na.rm = TRUE)) %>%
+  mutate(total_48 = total_24 + lag(total_24)) %>%
+  arrange(desc(total_48))
+```
 
-## 2. For each factor in gss_cat identify whether the order of the levels is arbitrary or principled.
 
-## 3. Why did moving "Not applicable" to the front of the levels move it to the bottom of the plot?
+## Question 5
+# The first tells you the flights that go to destinations with an airport that is not in the FAA list of destinations. The second tells you US airports that don't have a flight in the dataset (i.e. no flights arrived to that location). 
 
-### 15.5.1 EXERCISES
-## 1. How have the proportions of people identifying as Democrat, Republican, and Independent changed over time?
+## Question 6
+```{r}
+multi_carrier_planes <-
+  flights %>%
+  filter(!is.na(tailnum)) %>%
+  count(tailnum, carrier) %>%
+  count(tailnum) %>%
+  filter(nn > 1)
+multi_carrier_planes
+multi_carrier_planes <-
+  flights %>%
+  semi_join(multi_carrier_planes, by = "tailnum") %>%
+  select(tailnum, carrier) %>%
+  distinct() %>%
+  arrange(tailnum)
+multi_carrier_planes
+carrier_transfer_tbl <-
+  multi_carrier_planes %>%
+  group_by(tailnum) %>%
+  mutate(
+    carrier_num = seq_along(tailnum),
+    carrier_num = paste0("carrier_", carrier_num)
+  ) %>%
+  left_join(airlines, by = "carrier") %>%
+  select(-carrier) %>%
+  spread(carrier_num, name)
+carrier_transfer_tbl
+```
 
-## 2. How could you collapse rincome into a small set of categories?
+# 15.3.1 EXERCISES 
+## Question 1
+```{r}
+rincome_plot <-
+  gss_cat %>%
+  ggplot(aes(rincome)) +
+  geom_bar()
+rincome_plot
+```
+# The labels on the horizontal axis are too close together so it is impossible to read - in order to fix this, we could flip the graph so that these labels are written horizontally and taking up less space on the vertical axis as cocmpared to what they would do for the horizontal axis. 
+
+## Question 2
+#### The most common religion, as shown below, is Protestant and the most  common partyid is Independentt. 
+```{r}
+gss_cat %>%
+  count(relig) %>%
+  arrange(-n) %>%
+  head(1)
+
+gss_cat %>%
+  count(partyid) %>%
+  arrange(-n) %>%
+  head(1)
+```
+
+## Question 3
+#### It applies to protestant
+```{r}
+# finding out with a table
+gss_cat %>%
+  filter(!denom %in% c("No answer", "Other", "Don't know", "Not applicable",
+                       "No denomination")) %>%
+  count(relig)
+```
+
+```{r}
+# finding out with a visualization
+gss_cat %>%
+  count(relig, denom) %>%
+  ggplot(aes(x = relig, y = denom, size = n)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90))
+```
+
+# 15.4.1 EXERCISES
+
+## Question 1
+#### Although this depends on the purpose, i.e. what you are trying to use the summary for, you may want to use the median instead. The mean is affected by skewing of the data, so to get a better picture of the most realistic "normal" of the data, the median may be more accurate. However, the mean (unlike the median) does not ignore outliers, which are valid parts of the data set, so the mean can sometimes be more useful as well to get a more holistic idea of ALL data. 
+
+## Question 2
+#### The factors include:  marital, race, rincome, partyid, relig, denom.
+#### As shown in the code below, principled variables include:  marital, race, and denom & arbitrary variables include rincome (real income), relig, and denom.
+```{r}
+levels(gss_cat[["marital"]])
+gss_cat %>%
+  ggplot(aes(x = marital)) +
+  geom_bar()
+
+levels(gss_cat$race)
+gss_cat %>%
+  ggplot(aes(race)) +
+  geom_bar(drop = FALSE)
+
+levels(gss_cat$rincome)
+
+levels(gss_cat$relig)
+gss_cat %>%
+  ggplot(aes(relig)) +
+  geom_bar() +
+  coord_flip()
+
+levels(gss_cat$denom)
+
+levels(gss_cat$partyid)
+```
+
+## Question 3
+#### Moving it gave it a value of 1, thereby moving it to the bottom of the plot. 
+
+# 15.5.1 EXERCISES
+## Question 1
+#### A graph showing the general trend is below. None of the trends are extremely significant, but Republican identification has decreased overall, Democrat identification has remained relatively stable and independent/other has been on a slight uptrend overall. 
+
+```{r}
+gss_cat %>%
+  mutate(partyid =
+           fct_collapse(partyid,
+                        other = c("No answer", "Don't know", "Other party"),
+                        rep = c("Strong republican", "Not str republican"),
+                        ind = c("Ind,near rep", "Independent", "Ind,near dem"),
+                        dem = c("Not str democrat", "Strong democrat"))) %>%
+  count(year, partyid)  %>%
+  group_by(year) %>%
+  mutate(p = n / sum(n)) %>%
+  ggplot(aes(x = year, y = p,
+             colour = fct_reorder2(partyid, year, p))) +
+  geom_point() +
+  geom_line() +
+  labs(colour = "Party ID.")
+```
+
+## Question 2
+```{r}
+library("stringr")
+gss_cat %>%
+  mutate(rincome =
+           fct_collapse(
+             rincome,
+             `Unknown` = c("No answer", "Don't know", "Refused", "Not applicable"),
+             `Lt $5000` = c("Lt $1000", str_c("$", c("1000", "3000", "4000"),
+                                              " to ", c("2999", "3999", "4999"))),
+             `$5000 to 10000` = str_c("$", c("5000", "6000", "7000", "8000"),
+                                      " to ", c("5999", "6999", "7999", "9999"))
+           )) %>%
+  ggplot(aes(x = rincome)) +
+  geom_bar() +
+  coord_flip()
+```
