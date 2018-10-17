@@ -410,7 +410,7 @@ flights %>%
   )
 ```
 
-## Question 3
+## Question 3 ** -1 for not answering this question fully
 ```{r}
 plane_ages <-
   planes %>%
